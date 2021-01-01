@@ -3,3 +3,6 @@
 ################################################################################
 
 /BorderlessAddon/Release
+/BorderlessAddon/Debug/BorderlessAddon.tlog
+/BorderlessAddon/.vs/BorderlessAddon/v16
+/.vs
