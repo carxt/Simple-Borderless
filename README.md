@@ -14,7 +14,7 @@ In case you use the Ultimate ASI Loader, change the extension of the dll provide
 
 ### Supported applications:
 
-###### Any which support windowed mode
+###### Any Windows applications which support windowed mode
 
 
 ### Current features:
