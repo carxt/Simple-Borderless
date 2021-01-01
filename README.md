@@ -12,7 +12,7 @@ In case you use the Ultimate ASI Loader, change the extension of the dll provide
 ###### Visual Studio 2019
 
 
-### Supported games:
+### Supported applications:
 
 ###### Any which support windowed mode
 
