@@ -75,7 +75,7 @@ namespace FunctionHooks
 			dwExStyle &= ~(WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST);
 			HWND result = CreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
 				nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
-			if (!mainWindow) mainWindow = result;
+			if (!mainWindow || !::IsWindow(mainWindow)) mainWindow = result;
 			return result;
 		}
 		else return CreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
