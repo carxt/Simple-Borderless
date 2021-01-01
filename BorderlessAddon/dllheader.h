@@ -29,7 +29,7 @@ namespace FunctionHooks
 	{
 		if (!hWndParent)
 		{
-			//We assume this is the main window, could be wrong.
+			//We assume this is the main window
 			dwStyle &= ~WS_OVERLAPPEDWINDOW;
 			dwExStyle &= ~(WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST);
 			auto result = CreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
@@ -61,6 +61,57 @@ namespace FunctionHooks
 				break;
 			}
 		}
-		return SetWindowLongPtr(hWnd, nIndex, dwNewLong);
+		return SetWindowLongPtrA(hWnd, nIndex, dwNewLong);
+	}
+
+	HWND WINAPI HookCreateWindowExW(
+		DWORD     dwExStyle,
+		LPCWSTR   lpClassName,
+		LPCWSTR   lpWindowName,
+		DWORD     dwStyle,
+		int       X,
+		int       Y,
+		int       nWidth,
+		int       nHeight,
+		HWND      hWndParent,
+		HMENU     hMenu,
+		HINSTANCE hInstance,
+		LPVOID    lpParam
+	)
+	{
+		if (!hWndParent)
+		{
+			//We assume this is the main window
+			dwStyle &= ~WS_OVERLAPPEDWINDOW;
+			dwExStyle &= ~(WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST);
+			auto result = CreateWindowExW(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
+				nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
+			if (!mainWindow) mainWindow = result;
+			return result;
+		}
+		else return CreateWindowExW(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
+			nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
+	}
+	LONG_PTR  WINAPI HookSetWindowLongPtrW(
+		HWND hWnd,
+		int nIndex,
+		LONG dwNewLong)
+	{
+		if (hWnd == mainWindow)
+		{
+			switch (nIndex)
+			{
+			case GWL_STYLE:
+				dwNewLong &= ~WS_OVERLAPPEDWINDOW;
+				break;
+			case GWL_EXSTYLE:
+				dwNewLong &= ~(WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST);
+				break;
+			default:
+
+				break;
+			}
+		}
+		return SetWindowLongPtrW(hWnd, nIndex, dwNewLong);
 	}
 }
