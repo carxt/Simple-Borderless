@@ -1,5 +1,5 @@
 # Simple-Borderless
-Dynamic Link Library providing simple hooks for any application that supports windowed mode but not borderless
+Dynamic Link Library providing simple borderless mode hooks for any application that supports windowed mode but not borderless
 
 ### Installation:
 
