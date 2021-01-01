@@ -48,8 +48,19 @@ void* GetIATFunctionAddress(BYTE* base, const char* dll_name, const char* search
 	}
 	return nullptr;
 }
+//We check if the window handle is valid, and if it is, we check if it really belongs to our process
+bool SanityCheckWindow(HWND hWnd)
+{
+	//check if it's really a window
+	if (!::IsWindow(hWnd)) return false;
+	//it's a window, let's check if it belongs to our process
+	DWORD processID = NULL;
+	GetWindowThreadProcessId(hWnd, &processID);
+	if (processID != GetCurrentProcessId()) return false;
+	//it does belong to our process
+	return true;
 
-
+}
 namespace FunctionHooks
 {
 
@@ -75,7 +86,7 @@ namespace FunctionHooks
 			dwExStyle &= ~(WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST);
 			HWND result = CreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
 				nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
-			if (!mainWindow || !::IsWindow(mainWindow)) mainWindow = result;
+			if (!mainWindow || !SanityCheckWindow(mainWindow)) mainWindow = result;
 			return result;
 		}
 		else return CreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
@@ -127,7 +138,7 @@ namespace FunctionHooks
 			dwExStyle &= ~(WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST);
 			HWND result = CreateWindowExW(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
 				nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
-			if (!mainWindow || !::IsWindow(mainWindow)) mainWindow = result;
+			if (!mainWindow || !SanityCheckWindow(mainWindow)) mainWindow = result;
 			return result;
 		}
 		else return CreateWindowExW(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
