@@ -1,7 +1,7 @@
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 #include <windows.h>
-
+#include "iniManager.h"
 
 
 void MemsetOverridePerms(uintptr_t address, BYTE* data, DWORD size);
@@ -25,44 +25,12 @@ namespace FunctionHooks
 		HMENU     hMenu,
 		HINSTANCE hInstance,
 		LPVOID    lpParam
-	)
-	{
-		if (!hWndParent)
-		{
-			//We assume this is the main window
-			dwStyle &= ~WS_OVERLAPPEDWINDOW;
-			dwExStyle &= ~(WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST);
-			auto result = CreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
-				nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
-			if (!mainWindow) mainWindow = result;
-			return result;
-		}
-		else return CreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
-			nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
-	}
+	);
 
 	LONG_PTR  WINAPI HookSetWindowLongPtrA(
-			 HWND hWnd,
-			 int nIndex,
-			 LONG dwNewLong)
-	{
-		if (hWnd == mainWindow)
-		{
-			switch (nIndex)
-			{
-			case GWL_STYLE:
-				dwNewLong &= ~WS_OVERLAPPEDWINDOW;
-				break;
-			case GWL_EXSTYLE:
-				dwNewLong &= ~(WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST);
-				break;
-			default:
-
-				break;
-			}
-		}
-		return SetWindowLongPtrA(hWnd, nIndex, dwNewLong);
-	}
+		HWND hWnd,
+		int nIndex,
+		LONG dwNewLong);
 
 	HWND WINAPI HookCreateWindowExW(
 		DWORD     dwExStyle,
@@ -77,41 +45,26 @@ namespace FunctionHooks
 		HMENU     hMenu,
 		HINSTANCE hInstance,
 		LPVOID    lpParam
-	)
-	{
-		if (!hWndParent)
-		{
-			//We assume this is the main window
-			dwStyle &= ~WS_OVERLAPPEDWINDOW;
-			dwExStyle &= ~(WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST);
-			auto result = CreateWindowExW(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
-				nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
-			if (!mainWindow) mainWindow = result;
-			return result;
-		}
-		else return CreateWindowExW(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
-			nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
-	}
+	);
 	LONG_PTR  WINAPI HookSetWindowLongPtrW(
 		HWND hWnd,
 		int nIndex,
-		LONG dwNewLong)
-	{
-		if (hWnd == mainWindow)
-		{
-			switch (nIndex)
-			{
-			case GWL_STYLE:
-				dwNewLong &= ~WS_OVERLAPPEDWINDOW;
-				break;
-			case GWL_EXSTYLE:
-				dwNewLong &= ~(WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST);
-				break;
-			default:
-
-				break;
-			}
-		}
-		return SetWindowLongPtrW(hWnd, nIndex, dwNewLong);
-	}
+		LONG dwNewLong);
+	BOOL WINAPI HookSetWindowPos(
+		HWND hWnd,
+		HWND hWndInsertAfter,
+		int  X,
+		int  Y,
+		int  cx,
+		int  cy,
+		UINT uFlags
+	);
+	BOOL WINAPI HookMoveWindow(
+		HWND hWnd,
+		int  X,
+		int  Y,
+		int  nWidth,
+		int  nHeight,
+		BOOL bRepaint
+	);
 }
