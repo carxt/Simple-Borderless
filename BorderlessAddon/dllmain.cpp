@@ -73,7 +73,7 @@ namespace FunctionHooks
 			//We assume this is the main window
 			dwStyle &= ~WS_OVERLAPPEDWINDOW;
 			dwExStyle &= ~(WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST);
-			auto result = CreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
+			HWND result = CreateWindowExA(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
 				nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
 			if (!mainWindow) mainWindow = result;
 			return result;
@@ -125,7 +125,7 @@ namespace FunctionHooks
 			//We assume this is the main window
 			dwStyle &= ~WS_OVERLAPPEDWINDOW;
 			dwExStyle &= ~(WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST);
-			auto result = CreateWindowExW(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
+			HWND result = CreateWindowExW(dwExStyle, lpClassName, lpWindowName, dwStyle, X, Y,
 				nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam);
 			if (!mainWindow || !::IsWindow(mainWindow)) mainWindow = result;
 			return result;
@@ -213,7 +213,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID reserved)
 		//Since we do not need the thread library calls provided by the runtime, we disable them for our module
 		DisableThreadLibraryCalls((HMODULE)hInstance);
 		//In these calls, we detour the original functions to our desired code paths.
-		if (auto CreateWindowIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "CreateWindowExW"))
+		if (void* CreateWindowIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "CreateWindowExW"))
 		{
 			PatchAddressPointer((uintptr_t)CreateWindowIATAddress, (uintptr_t)&FunctionHooks::HookCreateWindowExW);
 			void* SetWindowLPtrIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "SetWindowLongPtrW");
@@ -224,7 +224,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID reserved)
 			}
 
 		}
-		if (auto CreateWindowIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "CreateWindowExA"))
+		if (void* CreateWindowIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "CreateWindowExA"))
 		{
 			PatchAddressPointer((uintptr_t)CreateWindowIATAddress, (uintptr_t)&FunctionHooks::HookCreateWindowExA);
 			void* SetWindowLPtrIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "SetWindowLongPtrA");
@@ -235,11 +235,11 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID reserved)
 			}
 
 		}
-		if (auto SetWindowsPosIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "SetWindowPos"))
+		if (void* SetWindowsPosIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "SetWindowPos"))
 		{
 			PatchAddressPointer((uintptr_t)SetWindowsPosIATAddress, (uintptr_t)FunctionHooks::HookSetWindowPos);
 		}
-		if (auto MoveWindowIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "MoveWindow"))
+		if (void* MoveWindowIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "MoveWindow"))
 		{
 			PatchAddressPointer((uintptr_t)MoveWindowIATAddress, (uintptr_t)FunctionHooks::HookMoveWindow);
 		}
@@ -247,11 +247,11 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID reserved)
 	//Detach message, which is where the process unloads all our changes.
 	//Here, we return everything to its original state
 	else if (dwReason == DLL_PROCESS_DETACH) {
-		if (auto CreateWindowIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "CreateWindowExW"))
+		if (void* CreateWindowIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "CreateWindowExW"))
 		{
 			PatchAddressPointer((uintptr_t)CreateWindowIATAddress, (uintptr_t)::CreateWindowExW);
 		}
-		if (auto CreateWindowIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "CreateWindowExA"))
+		if (void* CreateWindowIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "CreateWindowExA"))
 		{
 			PatchAddressPointer((uintptr_t)CreateWindowIATAddress, (uintptr_t)::CreateWindowExA);
 		}
@@ -269,11 +269,14 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID reserved)
 		{
 			PatchAddressPointer((uintptr_t)SetWindowLPtrIATAddress, (uintptr_t)SetWindowLongPtrA);
 		}
-		if (auto SetWindowsPosIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "SetWindowPos"))
+		if (void* SetWindowsPosIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "SetWindowPos"))
 		{
 			PatchAddressPointer((uintptr_t)SetWindowsPosIATAddress, (uintptr_t)::SetWindowPos);
 		}
-
+		if (void* MoveWindowIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "MoveWindow"))
+		{
+			PatchAddressPointer((uintptr_t)MoveWindowIATAddress, (uintptr_t)::MoveWindow);
+		}
 	}
 	return TRUE;
 }
