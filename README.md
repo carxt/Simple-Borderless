@@ -4,7 +4,7 @@ Dynamic Link Library providing simple hooks for any application that supports wi
 ### Installation:
 
 You need a DLL loader to use this, such as [ThirteenAG's Ultimate ASI Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader "Ultimate ASI Loader")
-In case you use the above, change the extension of the dll provided to .asi
+In case you use the Ultimate ASI Loader, change the extension of the dll provided to .asi
 
 ### Dependencies
 
