@@ -48,16 +48,17 @@ void* GetIATFunctionAddress(BYTE* base, const char* dll_name, const char* search
 	}
 	return nullptr;
 }
-
+//In the DLLMain, we create our hooks
 BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID reserved)
 {
-	//In the DLLMain, we create our hooks
+		
+	//Process attach is where our library gets attached to the process
+	//Therefore we create our hooks here
     if (dwReason == DLL_PROCESS_ATTACH) {
-		//Process attach is where our library gets attached to the process
-		//Therefore we create our hooks here
+	
 
 		//Since we do not need the thread library calls provided by the runtime, we disable them for our module
-        DisableThreadLibraryCalls((HMODULE)hInstance); 
+		DisableThreadLibraryCalls((HMODULE)hInstance); 
 		//In these calls, we detour the original functions to our desired code paths.
 		if (auto CreateWindowIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "CreateWindowExW"))
 		{
@@ -67,10 +68,7 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID reserved)
 			if (SetWindowAddress) 
 			{
 				PatchAddressPointer((uintptr_t)SetWindowAddress, (uintptr_t)&FunctionHooks::HookSetWindowLongPtrW);
-
-
 			}
-
 		}
 		if (auto CreateWindowIATAddress = GetIATFunctionAddress((BYTE*)GetModuleHandle(NULL), "USER32.dll", "CreateWindowExA"))
 		{
@@ -80,12 +78,9 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID reserved)
 			if (SetWindowAddress)
 			{
 				PatchAddressPointer((uintptr_t)SetWindowAddress, (uintptr_t)&FunctionHooks::HookSetWindowLongPtrA);
-
-
 			}
 
 		}
-
     }
 	//Detach message, which is where the process unloads all our changes.
 	//Here, we return everything to its original state
