@@ -22,7 +22,7 @@ In case you use the Ultimate ASI Loader, change the extension of the dll provide
 
 ###### Remove Window Borders
 ###### Customize window position and width
-###### Override window z priority
+###### Override window Z priority
 
 
 
