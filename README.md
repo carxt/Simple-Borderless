@@ -9,13 +9,13 @@ In case you use the Ultimate ASI Loader, change the extension of the dll provide
 
 ### Dependencies
 
-###### Visual Studio 2019
+###### MSVC++ 2019
 
 
 ### Supported applications:
 
 ###### Any Windows applications which support windowed mode
-
+###### DISCLAIMER: Do not use with applications using anti-tamper functionality such as anti-cheat. The plugin will probably be counted as tampering and you will probably get flagged as a cheater.
 
 ### Current features:
 
